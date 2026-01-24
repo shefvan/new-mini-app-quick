@@ -10,6 +10,10 @@ export async function generateMetadata(): Promise<Metadata> {
     title: minikitConfig.miniapp.name,
     description: minikitConfig.miniapp.description,
     other: {
+      // ✅ REQUIRED FOR BASE MINI APP VERIFICATION
+      "base:app_id": "6974aa443a92926b661fd32b",
+
+      // ✅ FARCASTER FRAME (KEEP AS IS)
       "fc:frame": JSON.stringify({
         version: minikitConfig.miniapp.version,
         imageUrl: minikitConfig.miniapp.heroImageUrl,
@@ -37,9 +41,9 @@ const sourceCodePro = Source_Code_Pro({
 
 export default function RootLayout({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode;
-}>) {
+}) {
   return (
     <RootProvider>
       <html lang="en">
