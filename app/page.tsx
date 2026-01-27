@@ -1,119 +1,54 @@
 "use client";
-import { useState, useEffect } from "react";
-import { useQuickAuth,useMiniKit } from "@coinbase/onchainkit/minikit";
+
+import { useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { minikitConfig } from "../minikit.config";
-import styles from "./page.module.css";
-
-interface AuthResponse {
-  success: boolean;
-  user?: {
-    fid: number; // FID is the unique identifier for the user
-    issuedAt?: number;
-    expiresAt?: number;
-  };
-  message?: string; // Error messages come as 'message' not 'error'
-}
-
+import { useAccount } from "wagmi";
+import { ConnectWallet } from "@coinbase/onchainkit/wallet";
 
 export default function Home() {
-  const { isFrameReady, setFrameReady, context } = useMiniKit();
-  const [email, setEmail] = useState("");
-  const [error, setError] = useState("");
+  const { isConnected } = useAccount();
   const router = useRouter();
 
-  // Initialize the  miniapp
   useEffect(() => {
-    if (!isFrameReady) {
-      setFrameReady();
+    if (isConnected) {
+      router.push("/dashboard");
     }
-  }, [setFrameReady, isFrameReady]);
- 
-  
-
-  // If you need to verify the user's identity, you can use the useQuickAuth hook.
-  // This hook will verify the user's signature and return the user's FID. You can update
-  // this to meet your needs. See the /app/api/auth/route.ts file for more details.
-  // Note: If you don't need to verify the user's identity, you can get their FID and other user data
-  // via `context.user.fid`.
-  // const { data, isLoading, error } = useQuickAuth<{
-  //   userFid: string;
-  // }>("/api/auth");
-
-  const { data: authData, isLoading: isAuthLoading, error: authError } = useQuickAuth<AuthResponse>(
-    "/api/auth",
-    { method: "GET" }
-  );
-
-  const validateEmail = (email: string) => {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return emailRegex.test(email);
-  };
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    setError("");
-
-    // Check authentication first
-    if (isAuthLoading) {
-      setError("Please wait while we verify your identity...");
-      return;
-    }
-
-    if (authError || !authData?.success) {
-      setError("Please authenticate to join the waitlist");
-      return;
-    }
-
-    if (!email) {
-      setError("Please enter your email address");
-      return;
-    }
-
-    if (!validateEmail(email)) {
-      setError("Please enter a valid email address");
-      return;
-    }
-
-    // TODO: Save email to database/API with user FID
-    console.log("Valid email submitted:", email);
-    console.log("User authenticated:", authData.user);
-    
-    // Navigate to success page
-    router.push("/success");
-  };
+  }, [isConnected, router]);
 
   return (
-    <div className={styles.container}>
-      <button className={styles.closeButton} type="button">
-        ✕
-      </button>
-      
-      <div className={styles.content}>
-        <div className={styles.waitlistForm}>
-          <h1 className={styles.title}>Join {minikitConfig.miniapp.name.toUpperCase()}</h1>
-          
-          <p className={styles.subtitle}>
-             Hey {context?.user?.displayName || "there"}, Get early access and be the first to experience the future of<br />
-            crypto marketing strategy.
-          </p>
+    <div
+      style={{
+        minHeight: "100vh",
+        backgroundImage: "url('/hero.png')",
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        padding: "20px",
+        color: "#ffffff",
+      }}
+    >
+      <div
+        style={{
+          width: "100%",
+          maxWidth: "420px",
+          background: "rgba(0,0,0,0.45)",
+          backdropFilter: "blur(12px)",
+          borderRadius: "24px",
+          padding: "32px 24px",
+          textAlign: "center",
+        }}
+      >
+        <h1 style={{ fontSize: "32px", fontWeight: 700 }}>
+          Based Tasks
+        </h1>
 
-          <form onSubmit={handleSubmit} className={styles.form}>
-            <input
-              type="email"
-              placeholder="Your amazing email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className={styles.emailInput}
-            />
-            
-            {error && <p className={styles.error}>{error}</p>}
-            
-            <button type="submit" className={styles.joinButton}>
-              JOIN WAITLIST
-            </button>
-          </form>
-        </div>
+        <p style={{ opacity: 0.85, margin: "12px 0 28px" }}>
+          Earn crypto rewards for social actions on Farcaster
+        </p>
+
+        <ConnectWallet />
       </div>
     </div>
   );
