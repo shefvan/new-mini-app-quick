@@ -1,0 +1,3 @@
+export const ADMIN_WALLETS = [
+  "0x68918b27ddf8567C9C0F8e1981F697fff7412F2C", // 👈 YOUR WALLET
+];

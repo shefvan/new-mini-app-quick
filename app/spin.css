@@ -1,0 +1,18 @@
+.auto-spin-box {
+  position: absolute;
+  left: 16px;            /* 👈 LEFT side */
+  bottom: 96px;          /* 👆 spin button inte mele */
+
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+
+  padding: 6px 10px;     /* 👈 SMALL box */
+  min-width: auto;
+
+  display: flex;
+  align-items: center;
+  gap: 6px;
+
+  font-size: 13px;
+}
