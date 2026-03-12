@@ -21,9 +21,11 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "No wallet" });
   }
 /* ================= WEIGHTED RANDOM ================= */
-function weightedRandom(users: any[]) {
-  const weighted = users.map(user => {
-    const followers = user.followers || 0;
+type Candidate = Record<string, unknown> & { followers?: number };
+
+function weightedRandom<T extends Candidate>(users: T[]): T {
+  const weighted = users.map((user) => {
+    const followers = typeof user.followers === "number" ? user.followers : 0;
 
     // 🔥 Followers koodiyaal weight kurayum
     const weight = 100000 / (followers + 1000);
@@ -37,12 +39,12 @@ function weightedRandom(users: any[]) {
 
   for (const user of weighted) {
     if (random < user.weight) {
-      return user;
+      return user as T;
     }
     random -= user.weight;
   }
 
-  return weighted[0]; // fallback
+  return weighted[0] as T; // fallback
 }
   /* ================= GET USER ================= */
   const { data: user } = await supabase

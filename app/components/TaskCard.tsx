@@ -8,21 +8,42 @@ import {
   UserPlus,
 } from "lucide-react";
 
+type TaskActionType =
+  | "like"
+  | "reply"
+  | "repost"
+  | "recast"
+  | "bookmark"
+  | "follow";
+
+type Task = {
+  platform: string;
+  action_type: string;
+  reward?: number;
+  url: string;
+};
+
 interface Props {
-  task: any;
+  task: Task;
   onCheck: () => void;
 }
 
 export default function TaskCard({ task, onCheck }: Props) {
 
-  const actionMap: any = {
-  like: { title: "Like the post", icon: Heart },
-  reply: { title: "Reply to the post", icon: MessageCircle },
-  repost: { title: "Repost the post", icon: Repeat2 },
-  recast: { title: "Recast the post", icon: Repeat2 },
-  bookmark: { title: "Bookmark the post", icon: Bookmark },
-  follow: { title: "Follow the account", icon: UserPlus },
-};
+  const actionMap: Record<
+    TaskActionType,
+    {
+      title: string;
+      icon: React.ComponentType<{ size?: number; strokeWidth?: number }>;
+    }
+  > = {
+    like: { title: "Like the post", icon: Heart },
+    reply: { title: "Reply to the post", icon: MessageCircle },
+    repost: { title: "Repost the post", icon: Repeat2 },
+    recast: { title: "Recast the post", icon: Repeat2 },
+    bookmark: { title: "Bookmark the post", icon: Bookmark },
+    follow: { title: "Follow the account", icon: UserPlus },
+  };
 
   const platformName =
     task.platform === "twitter"
@@ -40,14 +61,19 @@ export default function TaskCard({ task, onCheck }: Props) {
 
         <div className="task-left">
           <div className="task-icon text-blue-600">
-  {(() => {
-    const Icon = actionMap[task.action_type]?.icon;
-    return Icon ? <Icon size={20} strokeWidth={1.5} /> : null;
-  })()}
-</div>
+            {(() => {
+              const action = task.action_type as TaskActionType;
+              const Icon = actionMap[action]?.icon;
+              return Icon ? <Icon size={20} strokeWidth={1.5} /> : null;
+            })()}
+          </div>
 
           <h4 className="task-title">
-            {actionMap[task.action_type]?.title} {platformName}
+            {(() => {
+              const action = task.action_type as TaskActionType;
+              return actionMap[action]?.title ?? task.action_type;
+            })()}{" "}
+            {platformName}
           </h4>
         </div>
 

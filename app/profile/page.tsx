@@ -3,10 +3,15 @@
 import { useAccount } from "wagmi";
 import { useEffect, useState } from "react";
 
+type HistoryItem = {
+  source: string;
+  points: number;
+};
+
 export default function ProfilePage() {
   const { address, isConnected } = useAccount();
 
-  const [history, setHistory] = useState<any[]>([]);
+  const [history, setHistory] = useState<HistoryItem[]>([]);
   const [referrals, setReferrals] = useState(0);
 
   const shortAddress = address
@@ -159,7 +164,7 @@ export default function ProfilePage() {
         </button>
 
         <p style={{ marginTop: 12, opacity: 0.6 }}>
-          Share your link and earn 50% of your referrals' points!
+          Share your link and earn 50% of your referrals&apos; points!
         </p>
       </div>
 

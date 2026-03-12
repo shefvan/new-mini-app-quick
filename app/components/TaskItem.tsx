@@ -27,7 +27,7 @@ export default function TaskItem({ task }: { task: Task }) {
 
       {confirm && (
         <ConfirmModal
-          onDone={() => {
+          onConfirm={() => {
             setDone(true);
             setConfirm(false);
           }}

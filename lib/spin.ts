@@ -7,12 +7,14 @@ import type { Builder } from "./builders";
   - followers (for DB users)
 */
 
-export function spinBuilder(candidates: any[]): Builder {
+type Candidate = Builder & Partial<{ weight: number; followers: number }>;
+
+export function spinBuilder(candidates: Candidate[]): Builder {
   if (!candidates || candidates.length === 0) {
     throw new Error("No candidates available");
   }
 
-  const pool: any[] = [];
+  const pool: Candidate[] = [];
 
   candidates.forEach((c) => {
     // 🔹 If static builder with weight

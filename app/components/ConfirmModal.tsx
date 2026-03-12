@@ -1,7 +1,12 @@
 "use client";
 import { useEffect, useState } from "react";
 
-export default function ConfirmModal({ onConfirm, onClose }: any) {
+type ConfirmModalProps = {
+  onConfirm: () => void;
+  onClose: () => void;
+};
+
+export default function ConfirmModal({ onConfirm, onClose }: ConfirmModalProps) {
   const [seconds, setSeconds] = useState(3);
 
   useEffect(() => {

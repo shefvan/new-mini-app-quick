@@ -19,13 +19,6 @@ type Task = {
 
 
 const TREASURY = "0x68918b27ddf8567C9C0F8e1981F697fff7412F2C".toLowerCase();
-const actionMap: Record<string, { title: string; emoji: string }> = {
-  like: { title: "Like the post", emoji: "❤️" },
-  reply: { title: "Reply to the post", emoji: "💬" },
-  repost: { title: "Repost the post", emoji: "🔁" },
-  bookmark: { title: "Bookmark the post", emoji: "🔖" },
-  recast: { title: "Recast the post", emoji: "🔁" },
-};
 
 type Platform = "twitter" | "base";
 type TaskType = "post" | "follow";
@@ -169,15 +162,14 @@ return (
   <div className="task-list">
 
     {Object.entries(
-      tasks.reduce((acc: any, task) => {
-        if (!acc[task.url]) acc[task.url] = [];
-        acc[task.url].push(task);
+      tasks.reduce<Record<string, Task[]>>((acc, task) => {
+        (acc[task.url] ||= []).push(task);
         return acc;
       }, {})
-    ).map(([url, groupedTasks]: any) => (
+    ).map(([url, groupedTasks]) => (
 
       <div className="task-group-card" key={url}>
-        {groupedTasks.map((task: Task) => (
+        {groupedTasks.map((task) => (
           <TaskCard
             key={task.id}
             task={task}

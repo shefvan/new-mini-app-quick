@@ -170,7 +170,7 @@ export default function AutoPage() {
 
       setLevel((prev) => prev + 1);
       setLastUpdate(Date.now());
-    } catch (err) {
+    } catch {
       console.log("Upgrade failed");
     }
 

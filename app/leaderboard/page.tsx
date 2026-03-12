@@ -1,7 +1,7 @@
 "use client";
 
 import ConnectGateCard from "@/components/ConnectGateCard";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useAccount } from "wagmi";
 import "./leaderboard.css";
 
@@ -29,15 +29,7 @@ export default function LeaderboardPage() {
     setMounted(true);
   }, []);
 
-  useEffect(() => {
-    if (!mounted) return;
-
-    loadData();
-    const interval = setInterval(loadData, 10000);
-    return () => clearInterval(interval);
-  }, [address, mounted]);
-
-  async function loadData() {
+  const loadData = useCallback(async () => {
     try {
       const res = await fetch("/api/leaderboard");
       const data = await res.json();
@@ -61,10 +53,18 @@ export default function LeaderboardPage() {
           setMyPoints(sorted[index].total_points);
         }
       }
-    } catch (err) {
+    } catch {
       console.log("Leaderboard load failed");
     }
-  }
+  }, [address]);
+
+  useEffect(() => {
+    if (!mounted) return;
+
+    loadData();
+    const interval = setInterval(loadData, 10000);
+    return () => clearInterval(interval);
+  }, [loadData, mounted]);
 
   function renderRank(index: number) {
     if (index === 0) return "🥇";

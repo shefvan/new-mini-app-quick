@@ -13,6 +13,8 @@ import { base } from "wagmi/chains";
 import { parseUnits, parseEther} from "viem";                                
 import "./spin.css";                               
 import type { Builder } from "@/lib/builders";                
+
+type PreviewUser = Builder & { bio?: string };
                 
 /* ================= CONSTANTS ================= */                
 const USDC_BASE =                
@@ -62,7 +64,7 @@ const wallet = address?.toLowerCase();
   const { writeContractAsync } = useWriteContract();             
   const { sendTransactionAsync } = useSendTransaction();               
                 
-  const balanceText = balanceData                
+  const _balanceText = balanceData                
     ? Number(balanceData.formatted).toFixed(2) + " USDC"                
     : "--";                
             
@@ -73,20 +75,22 @@ const wallet = address?.toLowerCase();
   const [autoSpin, setAutoSpin] = useState(false);                
   const [spinning, setSpinning] = useState(false);                
   const [winner, setWinner] = useState<Builder | null>(null);              
-  const [points, setPoints] = useState(0);                
+  const [_points, setPoints] = useState(0);                
   const [canCheckIn, setCanCheckIn] = useState(false);                
   const [buying, setBuying] = useState(false);                               
   const [showConfetti, setShowConfetti] = useState(false);                
-  const [confettiItems, setConfettiItems] = useState<any[]>([]);                
-  const [spinUsers, setSpinUsers] = useState<any[]>([]);
+  const [confettiItems, setConfettiItems] = useState<
+    Array<{ left: string; color: string; delay: string }>
+  >([]);                
+  const [spinUsers, setSpinUsers] = useState<PreviewUser[]>([]);
   const [autoIndex, setAutoIndex] = useState(0);              
   const [timeLeft, setTimeLeft] = useState(0); 
   const TREASURY = "0x68918b27ddf8567C9C0F8e1981F697fff7412F2C".toLowerCase();
 
-const isTreasury =
+const _isTreasury =
   address?.toLowerCase() === TREASURY;
 
-const allPreviewUsers = [...builders, ...spinUsers];
+const allPreviewUsers: PreviewUser[] = [...builders, ...spinUsers];
 
 const previewBuilder =
   allPreviewUsers.length > 0

@@ -47,7 +47,8 @@ export default function AppHeader() {
   }, []);
 
   useEffect(() => {
-    function handleClick(e: any) {
+    function handleClick(e: MouseEvent) {
+      if (!(e.target instanceof Node)) return;
       if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
         setOpen(false);
       }
@@ -138,6 +139,7 @@ export default function AppHeader() {
 
             <img
               src={avatar}
+              alt="avatar"
               style={{
                 width: 26,
                 height: 26,

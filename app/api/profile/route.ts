@@ -5,7 +5,11 @@ import { NextResponse } from "next/server";
 
 export async function GET(req: Request) {
   const res = NextResponse.next();
-  const session = await getIronSession(req, res, sessionOptions);
+  const session = await getIronSession<{ wallet?: string }>(
+    req,
+    res,
+    sessionOptions
+  );
 
   if (!session.wallet) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
