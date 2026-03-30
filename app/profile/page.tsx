@@ -2,6 +2,7 @@
 
 import { useAccount } from "wagmi";
 import { useEffect, useState } from "react";
+import { signIn, useSession } from "next-auth/react";
 
 type HistoryItem = {
   source: string;
@@ -13,6 +14,7 @@ export default function ProfilePage() {
 
   const [history, setHistory] = useState<HistoryItem[]>([]);
   const [referrals, setReferrals] = useState(0);
+  const { data: session } = useSession();
 
   const shortAddress = address
     ? `${address.slice(0, 6)}...${address.slice(-4)}`
@@ -76,24 +78,42 @@ export default function ProfilePage() {
         <div style={{ display: "flex", gap: 12, marginTop: 12 }}>
 
           {/* Connect X */}
-          <a
-            href="https://twitter.com"
-            target="_blank"
-            style={{
-              flex: 1,
-              padding: "12px",
-              borderRadius: 14,
-              background: "linear-gradient(135deg,#000,#1a1a1a)",
-              color: "#fff",
-              textAlign: "center",
-              fontWeight: 600,
-              textDecoration: "none",
-              boxShadow: "0 4px 14px rgba(0,0,0,0.2)",
-            }}
-          >
-            Connect X
-          </a>
-
+          {session ? (
+  <button
+    style={{
+      flex: 1,
+      padding: "12px",
+      borderRadius: 14,
+      background: "linear-gradient(135deg,#000,#1a1a1a)",
+      color: "#fff",
+      textAlign: "center",
+      fontWeight: 600,
+      border: "none",
+      cursor: "not-allowed",
+      boxShadow: "0 4px 14px rgba(0,0,0,0.2)",
+    }}
+  >
+    ✅ @{(session as any).token?.username}
+  </button>
+) : (
+  <button
+    onClick={() => signIn("twitter")}
+    style={{
+      flex: 1,
+      padding: "12px",
+      borderRadius: 14,
+      background: "linear-gradient(135deg,#000,#1a1a1a)",
+      color: "#fff",
+      textAlign: "center",
+      fontWeight: 600,
+      border: "none",
+      cursor: "pointer",
+      boxShadow: "0 4px 14px rgba(0,0,0,0.2)",
+    }}
+  >
+    Connect X
+  </button>
+)}
           {/* Connect Farcaster */}
           <a
             href="https://warpcast.com/~/settings/connected-accounts"
