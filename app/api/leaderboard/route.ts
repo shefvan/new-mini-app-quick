@@ -8,8 +8,16 @@ const supabase = createClient(
 export async function GET() {
   const { data: players } = await supabase
     .from("users")
-    .select("id, username, avatar, total_points, wallet")
+    .select("id, username, avatar, total_points, mining_points, wallet")
     .order("total_points", { ascending: false });
+
+  // Combine total_points and mining_points for leaderboard ranking
+  const combined = (players || [])
+    .map((p) => ({
+      ...p,
+      combined_points: (p.total_points || 0) + (p.mining_points || 0),
+    }))
+    .sort((a, b) => b.combined_points - a.combined_points);
 
   const { data: reward } = await supabase
     .from("reward_pool")
@@ -17,11 +25,10 @@ export async function GET() {
     .single();
 
   return Response.json({
-    players,
+    players: combined,
     rewardPool: reward?.amount || 0,
     maxAmount: reward?.max_amount || 5000,
     seasonName: reward?.season_name || "Season 1",
-    seasonDescription:
-      reward?.season_description || "Rewards Coming Soon 🎉",
+    seasonDescription: reward?.season_description || "Rewards Coming Soon 🎉",
   });
 }

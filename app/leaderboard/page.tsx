@@ -10,6 +10,8 @@ interface Player {
   username: string;
   avatar: string;
   total_points: number;
+  mining_points: number;
+  combined_points: number;
   wallet: string;
 }
 
@@ -50,7 +52,7 @@ export default function LeaderboardPage() {
 
         if (index !== -1) {
           setMyRank(index + 1);
-          setMyPoints(sorted[index].total_points);
+          setMyPoints(sorted[index].combined_points);
         }
       }
     } catch {
@@ -152,8 +154,8 @@ export default function LeaderboardPage() {
               </div>
 
               <span className="points">
-                {player.total_points} Points
-              </span>
+  {player.combined_points} Points
+</span>
 
             </div>
           ))}

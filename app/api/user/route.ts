@@ -9,14 +9,35 @@ export async function GET(req: Request) {
     return NextResponse.json({ error: "No wallet" }, { status: 400 });
   }
 
+  const lowerWallet = wallet.toLowerCase();
+
   const { data, error } = await supabase
     .from("users")
     .select("*")
-    .eq("wallet", wallet.toLowerCase())  // 🔥 FIX
+    .eq("wallet", lowerWallet)
     .maybeSingle();
 
   if (error) {
     return NextResponse.json({ error }, { status: 500 });
+  }
+
+  // If the user doesn't exist, create a new one with default values
+  if (!data) {
+    const { data: newUser, error: insertError } = await supabase
+      .from("users")
+      .insert({
+        wallet: lowerWallet,
+        spins: 0,
+        total_points: 0,
+      })
+      .select()
+      .single();
+
+    if (insertError) {
+      return NextResponse.json({ error: insertError.message }, { status: 500 });
+    }
+
+    return NextResponse.json(newUser);
   }
 
   return NextResponse.json(data);

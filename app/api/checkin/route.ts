@@ -13,7 +13,7 @@ export async function POST(req: Request) {
   const { data } = await supabase
     .from("users")
     .select("spins, last_checkin")
-    .eq("wallet", wallet)
+    .eq("wallet", wallet.toLowerCase())
     .single();
 
   if (!data)
@@ -33,7 +33,7 @@ export async function POST(req: Request) {
       spins: updatedSpins,
       last_checkin: now,
     })
-    .eq("wallet", wallet);
+    .eq("wallet", wallet.toLowerCase());
 
   return NextResponse.json({
     spins: updatedSpins,

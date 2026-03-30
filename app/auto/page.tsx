@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect,useCallback} from "react";
 import {
   useAccount,
   useWriteContract,
@@ -37,6 +37,7 @@ export default function AutoPage() {
   const [total, setTotal] = useState(0);
   const [lastUpdate, setLastUpdate] = useState<number | null>(null);
   const [upgrading, setUpgrading] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
 
   /* ---------------- HEADER ---------------- */
 
@@ -91,24 +92,41 @@ export default function AutoPage() {
     );
   }, [level, started, total, lastUpdate, address, mounted]);
 
-  /* ---------------- LIVE MINING ---------------- */
 
-  useEffect(() => {
-    if (!mounted || !started || !lastUpdate) return;
 
-    const interval = setInterval(() => {
-      const now = Date.now();
-      const seconds = (now - lastUpdate) / 1000;
+  
 
-      const ptsPerMin = level * 0.05;
-      const earned = (ptsPerMin / 60) * seconds;
+ /* ---------------- SYNC TO DB ---------------- */
+const syncPointsToDB = useCallback(async (points: number) => {
+  if (!address || points <= 0) return;
+  await fetch("/api/update-points", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      wallet: address.toLowerCase(),
+      points: Math.floor(points),
+    }),
+  });
+}, [address]);
 
-      setTotal((prev) => prev + earned);
-      setLastUpdate(now);
-    }, 1000);
-
-    return () => clearInterval(interval);
-  }, [started, level, lastUpdate, mounted]);
+/* ---------------- LIVE MINING ---------------- */
+useEffect(() => {
+  if (!mounted || !started || !lastUpdate) return;
+  let tickCount = 0;
+  const interval = setInterval(() => {
+    const now = Date.now();
+    const seconds = (now - lastUpdate) / 1000;
+    const ptsPerMin = level * 0.05;
+    const earned = (ptsPerMin / 60) * seconds;
+    setTotal((prev) => prev + earned);
+    setLastUpdate(now);
+    tickCount++;
+    if (tickCount % 30 === 0) {
+      syncPointsToDB(Math.floor(total + earned));
+    }
+  }, 1000);
+  return () => clearInterval(interval);
+}, [started, level, lastUpdate, mounted, syncPointsToDB]);
 
   /* ---------------- START ---------------- */
 
@@ -121,19 +139,20 @@ export default function AutoPage() {
   }
 
   /* ---------------- REFRESH ---------------- */
-
-  function handleRefresh() {
-    if (!lastUpdate) return;
-
-    const now = Date.now();
-    const seconds = (now - lastUpdate) / 1000;
-
-    const ptsPerMin = level * 0.05;
-    const earned = (ptsPerMin / 60) * seconds;
-
-    setTotal((prev) => prev + earned);
-    setLastUpdate(now);
-  }
+async function handleRefresh() {
+  if (!lastUpdate || refreshing) return;
+  setRefreshing(true);
+  const now = Date.now();
+  const seconds = (now - lastUpdate) / 1000;
+  const ptsPerMin = level * 0.05;
+  const earned = (ptsPerMin / 60) * seconds;
+  const newTotal = total + earned;
+  setTotal(newTotal);
+  setLastUpdate(now);
+  await syncPointsToDB(Math.floor(newTotal));
+  setRefreshing(false);
+}
+  
 
   /* ---------------- UPGRADE ---------------- */
 
@@ -215,6 +234,8 @@ export default function AutoPage() {
   const ptsPerDay = started ? ptsPerMin * 60 * 24 : 0;
 
   return (
+  <>
+    <style>{`@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }`}</style>
     <div style={{ padding: 20 }}>
       <Header />
 
@@ -230,34 +251,52 @@ export default function AutoPage() {
         <div style={{ display: "flex", justifyContent: "space-between" }}>
           <h3>⛏ Points Miner</h3>
 
-          <div style={{ display: "flex", gap: 10 }}>
-            <button
-              style={{
-                padding: "6px 14px",
-                borderRadius: 12,
-                border: "1px solid #ddd",
-                background: "#f3f4f6",
-                color: "#aaa",
-                fontWeight: 600,
-                cursor: "not-allowed",
-              }}
-            >
-              AUTO
-            </button>
+          <div style={{ display: "flex", gap: 8 }}>
+  {/* AUTO button */}
+  <button style={{
+    padding: "4px 14px",
+    borderRadius: 20,
+    border: "none",
+    background: "#f0f0f0",
+    color: "#bbb",
+    fontWeight: 700,
+    fontSize: 12,
+    letterSpacing: 1,
+    cursor: "not-allowed",
+    height: 28
+  }}>AUTO</button>
 
-            <button
-              onClick={handleRefresh}
-              style={{
-                padding: "6px 14px",
-                borderRadius: 12,
-                border: "1px solid #ddd",
-                background: "#fff",
-                fontWeight: 600,
-              }}
-            >
-              REFRESH
-            </button>
-          </div>
+  {/* REFRESH button */}
+  <button
+    onClick={handleRefresh}
+    disabled={refreshing}
+    style={{
+      padding: "6px 14px",
+      borderRadius: 20,
+      border: "none",
+      background: refreshing ? "#f0f0f0" : "linear-gradient(135deg, #010204, #060513)",
+      color: refreshing ? "#bbb" : "#fff",
+      fontWeight: 700,
+      fontSize: 11,
+      lineHeight: 1,
+      letterSpacing: 1,
+      cursor: refreshing ? "not-allowed" : "pointer",
+      display: "flex",
+      alignItems: "center",
+      gap: 6,
+      boxShadow: refreshing ? "none" : "0 4px 12px rgba(79,70,229,0.35)",
+      transition: "all 0.2s ease",
+      height: 28
+    }}
+  >
+    <span style={{
+      display: "inline-block",
+      animation: refreshing ? "spin 1s linear infinite" : "none",
+      fontSize: 14,
+    }}>↻</span>
+    {!refreshing && "REFRESH"}
+  </button>
+</div>
         </div>
 
         <div
@@ -329,5 +368,6 @@ export default function AutoPage() {
         )}
       </div>
     </div>
+  </>
   );
 }

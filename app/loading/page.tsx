@@ -15,22 +15,11 @@ export default function LoadingPage() {
   }, [router]);    
     
   return (    
-    <div    
-      style={{    
-        minHeight: "100vh",    
-        background: "#000",    
-        display: "flex",    
-        alignItems: "center",    
-        justifyContent: "center",    
-      }}    
-    >    
+    <div className="loading-screen">    
       <img    
         src="/WhatsApp Image 2026-02-06 at 6.06.06 PM.jpeg"    
         alt="grow me"    
-        style={{    
-          width: 220,    
-          maxWidth: "80%",    
-        }}    
+        className="loading-logo"    
       />    
     </div>    
   );    

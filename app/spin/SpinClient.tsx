@@ -407,7 +407,7 @@ if (!mounted) return null;
   Spinning through the most based builders on X                
 </p>                
                 
-{!spinning && !winner && previewBuilder && (          
+      {!winner && previewBuilder && (          
   <div                
     style={{                
       marginTop: 16,                
@@ -422,8 +422,8 @@ if (!mounted) return null;
     </div>                
                 
     <img                
-      src={previewBuilder?.image}                
-      alt={previewBuilder?.username}                
+      src={previewBuilder.image}                
+      alt={previewBuilder.username}                
       className="preview-image"                
       style={{                
         width: 120,                
@@ -437,17 +437,17 @@ if (!mounted) return null;
                 
     <p style={{ marginTop: 8, fontWeight: 600 }}>                
   <a                
-    href={`https://x.com/${previewBuilder?.username}`}                
+    href={`https://x.com/${previewBuilder.username}`}                
     target="_blank"                
     rel="noopener noreferrer"                
     style={{ color: "#2563eb", textDecoration: "none" }}                
   >                
-    @{previewBuilder?.username}                
+    @{previewBuilder.username}                
   </a>                
 </p>                
                 
     <p style={{ fontSize: 12, opacity: 0.6 }}>                
-      {previewBuilder?.role|| previewBuilder?.bio}                
+      {previewBuilder.role || previewBuilder.bio}                
     </p>                
   </div>                
 )}              
