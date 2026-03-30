@@ -3,7 +3,14 @@
 import { useAccount } from "wagmi";
 import { useEffect, useState } from "react";
 import { signIn, useSession } from "next-auth/react";
+import { Session } from "next-auth";
 
+interface ExtendedSession extends Session {
+  token?: {
+    username?: string;
+    avatar?: string;
+  };
+}
 type HistoryItem = {
   source: string;
   points: number;
@@ -93,7 +100,7 @@ export default function ProfilePage() {
       boxShadow: "0 4px 14px rgba(0,0,0,0.2)",
     }}
   >
-    ✅ @{(session as any).token?.username}
+    ✅ @{(session as ExtendedSession).token?.username}
   </button>
 ) : (
   <button
