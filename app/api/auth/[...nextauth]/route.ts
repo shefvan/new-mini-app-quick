@@ -1,6 +1,15 @@
 import NextAuth from "next-auth";
 import TwitterProvider from "next-auth/providers/twitter";
 
+interface TwitterProfile {
+  data?: {
+    username?: string;
+    profile_image_url?: string;
+  };
+  screen_name?: string;
+  profile_image_url?: string;
+}
+
 const handler = NextAuth({
   providers: [
     TwitterProvider({
@@ -15,8 +24,9 @@ const handler = NextAuth({
     },
     async jwt({ token, profile }) {
       if (profile) {
-        token.username = (profile as any).data?.username;
-        token.avatar = (profile as any).data?.profile_image_url;
+        const p = profile as TwitterProfile;
+        token.username = p.data?.username || p.screen_name;
+        token.avatar = p.data?.profile_image_url || p.profile_image_url;
       }
       return token;
     },
