@@ -13,10 +13,11 @@ interface TwitterProfile {
 const handler = NextAuth({
   providers: [
     TwitterProvider({
-      clientId: process.env.TWITTER_CLIENT_ID!,
-      clientSecret: process.env.TWITTER_CLIENT_SECRET!,
-      version: "2.0",
-    }),
+  clientId: process.env.TWITTER_CLIENT_ID!,
+  clientSecret: process.env.TWITTER_CLIENT_SECRET!,
+  version: "2.0",
+  allowDangerousEmailAccountLinking: true,
+}),
   ],
   callbacks: {
     async session({ session, token }) {
